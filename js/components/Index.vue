@@ -56,9 +56,9 @@
 
       <!-- Delete Confirmation Modal -->
       <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel"
-        aria-hidden="true" ref="deleteModal">
-        <div class="modal-dialog">
-          <div class="modal-content">
+            aria-hidden="true" ref="deleteModal">
+            <div class="modal-dialog">
+            <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Delete</h5>
               <button type="button" class="btn-close" @click="closeModal" aria-label="Close"></button>
@@ -100,7 +100,7 @@
   </template>
 
 <script>
-import { onMounted, ref, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 
@@ -166,10 +166,11 @@ export default {
     };
 
     const openDeleteConfirmation = (id) => {
-      itemIdToDelete.value = id;
-      const modalInstance = new bootstrap.Modal(deleteModal.value);
-      modalInstance.show();
+        itemIdToDelete.value = id; // Set itemIdToDelete
+        const modalInstance = new bootstrap.Modal(deleteModal.value); // Initialize Bootstrap modal instance
+        modalInstance.show();
     };
+
 
     const closeModal = () => {
       const modalInstance = bootstrap.Modal.getInstance(deleteModal.value);
@@ -179,20 +180,26 @@ export default {
     };
 
     const confirmDelete = async () => {
-      if (itemIdToDelete.value !== null) {
-        try {
-          const uri = `http://localhost:8000/items/${itemIdToDelete.value}`;
-          await axios.delete(uri);
-          items.value = items.value.filter((item) => item.id !== itemIdToDelete.value);
-          successMessage.value = 'Item deleted successfully!';
-          setTimeout(() => {
-            successMessage.value = '';
-            router.push({ name: 'Index' });
-          }, 1000);
-        } catch (error) {
-          console.error('Error deleting item:', error);
+        if (itemIdToDelete.value !== null) {
+            await deleteItem(itemIdToDelete.value);
+            closeModal();
         }
-        closeModal();
+    };
+
+
+    const deleteItem = async (id) => {
+      try {
+        const uri = `http://localhost:8000/items/${id}`;
+        await axios.delete(uri);
+        items.value = items.value.filter((item) => item.id !== id);
+        successMessage.value = 'Item deleted successfully!';
+        setTimeout(() => {
+          successMessage.value = '';
+          router.push({ name: 'Index' });
+        }, 1000);
+      } catch (error) {
+        console.error('Error deleting item:', error);
+        // Handle error (e.g., show error message)
       }
     };
 
@@ -209,20 +216,22 @@ export default {
 
     return {
         items,
-      currentPage,
-      maxPrice,
-      itemTypes,
-      selectedItemTypes,
-      search,
-      shops,
-      totalPages,
-      nextPage,
-      previousPage,
-      resetPrice,
-      openDeleteConfirmation,
-      confirmDelete,
-      closeModal,
-      successMessage
+        currentPage,
+        maxPrice,
+        itemTypes,
+        selectedItemTypes,
+        search,
+        shops,
+        totalPages,
+        nextPage,
+        previousPage,
+        resetPrice,
+        deleteModal,
+        openDeleteConfirmation,
+        confirmDelete,
+        deleteItem,
+        closeModal,
+        successMessage
     };
   },
 };
